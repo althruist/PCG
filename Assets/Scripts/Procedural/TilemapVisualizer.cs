@@ -10,7 +10,20 @@ public class TilemapVisualizer : MonoBehaviour
     public enum TileType
     {
         Floor,
-        Wall
+        WallTop,
+        WallBottom,
+        WallLeft,
+        WallRight,
+        WallTopLeft,
+        WallTopRight,
+        WallBottomLeft,
+        WallBottomRight,
+        WallSingleHole,
+        WallInnerTopLeft,
+        WallInnerTopRight,
+        WallInnerBottomLeft,
+        WallInnerBottomRight,
+        WallFull
     }
 
     public enum BiomeType
@@ -67,12 +80,52 @@ public class TilemapVisualizer : MonoBehaviour
 
     public void GenerateTiles(TileType tileType, BiomeType biome, IEnumerable<Vector2Int> positions)
     {
-        if (!tileDictionary.TryGetValue((tileType, biome), out var info)) { return; }
+        if (!TryGetTileInfo(tileType, biome, out var info)) { return; }
 
         foreach (var pos in positions)
         {
             GenerateTile(info.tilemap, info.tileList, pos);
         }
+    }
+
+    private bool TryGetTileInfo(TileType tileType, BiomeType biome, out TileInfo info)
+    {
+        if (tileDictionary.TryGetValue((tileType, biome), out info) && IsUsable(info))
+        {
+            return true;
+        }
+
+        if (IsWallTile(tileType))
+        {
+            return tileDictionary.TryGetValue((TileType.WallTop, BiomeType.None), out info) && IsUsable(info);
+        }
+
+        return false;
+    }
+
+    private bool IsUsable(TileInfo info)
+    {
+        return info.tilemap != null
+            && info.tileList != null
+            && info.tileList.Count > 0;
+    }
+
+    private bool IsWallTile(TileType tileType)
+    {
+        return tileType == TileType.WallTop
+            || tileType == TileType.WallBottom
+            || tileType == TileType.WallLeft
+            || tileType == TileType.WallRight
+            || tileType == TileType.WallTopLeft
+            || tileType == TileType.WallTopRight
+            || tileType == TileType.WallBottomLeft
+            || tileType == TileType.WallBottomRight
+            || tileType == TileType.WallInnerTopLeft
+            || tileType == TileType.WallInnerTopRight
+            || tileType == TileType.WallInnerBottomLeft
+            || tileType == TileType.WallInnerBottomRight
+            || tileType == TileType.WallSingleHole
+            || tileType == TileType.WallFull;
     }
 
     private void GenerateTile(Tilemap tilemap, List<TileBase> tileList, Vector2Int pos)

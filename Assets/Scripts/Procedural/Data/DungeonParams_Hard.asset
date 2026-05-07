@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 119d9dd74986d47449d9a99ec55483c3, type: 3}
   m_Name: DungeonParams_Hard
   m_EditorClassIdentifier: Assembly-CSharp::DungeonSettings
-  repetitions: 20
-  walkLength: 24
-  corridorLength: 27
-  corridorCount: 15
+  repetitions: 7
+  walkLength: 13
+  corridorLength: 21
+  corridorCount: 18
