@@ -52,7 +52,7 @@ public class TilemapVisualizer : MonoBehaviour
         public List<TileBase> tiles;
     }
 
-    [Header("Floor Tiles per Biome")]
+    [Header("Tile Lists")]
     [SerializeField] private List<TileEntry> tileEntries;
 
     private Dictionary<(TileType, BiomeType), TileInfo> tileDictionary;

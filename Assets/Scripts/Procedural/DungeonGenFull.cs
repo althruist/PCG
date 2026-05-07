@@ -81,7 +81,7 @@ public class DungeonGenFull : WalkGenerator
         {
             if(roomFloors.Contains(position) == false)
             {
-                var roomFloor = RunRandomWalk(parameters, position);
+                var roomFloor = RunRandomWalk(position);
                 rooms.Add(new DungeonRoom(position, roomFloor));
                 roomFloors.UnionWith(roomFloor);
             }
@@ -122,7 +122,7 @@ public class DungeonGenFull : WalkGenerator
 
         foreach (var roomPosition in roomToCreate)
         {
-            var roomFloor = RunRandomWalk(parameters, roomPosition);
+            var roomFloor = RunRandomWalk(roomPosition);
             rooms.Add(new DungeonRoom(roomPosition, roomFloor));
         }
         return rooms;
@@ -224,9 +224,9 @@ public class DungeonGenFull : WalkGenerator
         var currentPos = startPos;
         potentialRoomPos.Add(currentPos);
 
-        for (int i = 0; i < parameters.corridorCount; i++)
+        for (int i = 0; i < corridorCount; i++)
         {
-            var path = DungeonAlgorithm.CorridorGen(currentPos, parameters.corridorLength);
+            var path = DungeonAlgorithm.CorridorGen(currentPos, corridorLength);
             tilemapVisualizer.GenerateTiles(TilemapVisualizer.TileType.Floor, TilemapVisualizer.BiomeType.Obsidian, path);
             currentPos = path[path.Count - 1];
             potentialRoomPos.Add(currentPos);
