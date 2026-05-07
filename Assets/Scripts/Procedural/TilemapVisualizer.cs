@@ -26,7 +26,9 @@ public class TilemapVisualizer : MonoBehaviour
         WallInnerBottomRight,
         WallFull,
         Spawn,
-        End
+        End,
+        Water,
+        Lava
     }
 
     public enum BiomeType
@@ -94,6 +96,13 @@ public class TilemapVisualizer : MonoBehaviour
     private bool TryGetTileInfo(TileType tileType, BiomeType biome, out TileInfo info)
     {
         if (tileDictionary.TryGetValue((tileType, biome), out info) && IsUsable(info))
+        {
+            return true;
+        }
+
+        if (biome != BiomeType.None
+            && tileDictionary.TryGetValue((tileType, BiomeType.None), out info)
+            && IsUsable(info))
         {
             return true;
         }

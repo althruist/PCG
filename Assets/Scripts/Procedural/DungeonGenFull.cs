@@ -59,6 +59,7 @@ public class DungeonGenFull : WalkGenerator
         HashSet<Vector2Int> potentialRoomPositions = new HashSet<Vector2Int>();
         tilemapVisualizer.Clear();
         CreateCorridors(floorPositions, potentialRoomPositions);
+        HashSet<Vector2Int> corridorPositions = new HashSet<Vector2Int>(floorPositions);
 
         List<DungeonRoom> rooms = CreateRooms(potentialRoomPositions);
         HashSet<Vector2Int> roomPos = MergeRoomFloors(rooms);
@@ -70,7 +71,12 @@ public class DungeonGenFull : WalkGenerator
         floorPositions.UnionWith(roomPos);
         SelectSpawnAndEndRooms(rooms, floorPositions);
 
-        tilemapVisualizer.GenerateTiles(TilemapVisualizer.TileType.Floor, TilemapVisualizer.BiomeType.Obsidian, floorPositions);
+        var biomeByPosition = GenerateFloorTiles(floorPositions);
+        GenerateLiquidPonds(
+            floorPositions,
+            biomeByPosition,
+            corridorPositions,
+            new[] { spawnRoomCenter, endRoomCenter });
         WallGenerator.CreateWalls(floorPositions, tilemapVisualizer);
         GenerateSpawnEndTiles();
     }
@@ -227,7 +233,6 @@ public class DungeonGenFull : WalkGenerator
         for (int i = 0; i < corridorCount; i++)
         {
             var path = DungeonAlgorithm.CorridorGen(currentPos, corridorLength);
-            tilemapVisualizer.GenerateTiles(TilemapVisualizer.TileType.Floor, TilemapVisualizer.BiomeType.Obsidian, path);
             currentPos = path[path.Count - 1];
             potentialRoomPos.Add(currentPos);
             floorPos.UnionWith(path);

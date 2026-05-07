@@ -15,7 +15,8 @@ public class WalkGenerator : DungeonGenerator
     {
         tilemapVisualizer.Clear();
         HashSet<Vector2Int> floorPositions = RunRandomWalk(startPos);
-        tilemapVisualizer.GenerateTiles(TilemapVisualizer.TileType.Floor, TilemapVisualizer.BiomeType.Obsidian, floorPositions);
+        var biomeByPosition = GenerateFloorTiles(floorPositions);
+        GenerateLiquidPonds(floorPositions, biomeByPosition);
         WallGenerator.CreateWalls(floorPositions, tilemapVisualizer);
     }
     [Button("Reset Dungeon", ButtonSizes.Large), GUIColor(1f, 0.5f, 0.5f)]
