@@ -23,7 +23,9 @@ public class TilemapVisualizer : MonoBehaviour
         WallInnerTopRight,
         WallInnerBottomLeft,
         WallInnerBottomRight,
-        WallFull
+        WallFull,
+        Spawn,
+        End
     }
 
     public enum BiomeType
