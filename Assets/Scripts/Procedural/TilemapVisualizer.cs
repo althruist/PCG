@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Random = UnityEngine.Random;
@@ -84,7 +85,7 @@ public class TilemapVisualizer : MonoBehaviour
     {
         if (!TryGetTileInfo(tileType, biome, out var info)) { return; }
 
-        foreach (var pos in positions)
+        foreach (var pos in positions.OrderBy(position => position.x).ThenBy(position => position.y))
         {
             GenerateTile(info.tilemap, info.tileList, pos);
         }

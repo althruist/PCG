@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sirenix.OdinInspector;
@@ -92,7 +91,7 @@ public class DungeonGenFull : WalkGenerator
     private List<Vector2Int> FindAllDeadEnds(HashSet<Vector2Int> floorPositions)
     {
         List<Vector2Int> deadEnds = new List<Vector2Int>();
-        foreach (var position in floorPositions)
+        foreach (var position in floorPositions.OrderBy(position => position.x).ThenBy(position => position.y))
         {
             int neighboursCount = 0;
             foreach (var dir in Direction.dirList)
@@ -114,7 +113,12 @@ public class DungeonGenFull : WalkGenerator
     {
         List<DungeonRoom> rooms = new List<DungeonRoom>();
         int roomsCount = Mathf.RoundToInt(potentialRoomPositions.Count * roomPercent);
-        List<Vector2Int> roomToCreate = potentialRoomPositions.OrderBy(x => Guid.NewGuid()).Take(roomsCount).ToList();
+        List<Vector2Int> roomToCreate = potentialRoomPositions
+            .OrderBy(position => position.x)
+            .ThenBy(position => position.y)
+            .OrderBy(_ => UnityEngine.Random.value)
+            .Take(roomsCount)
+            .ToList();
 
         foreach (var roomPosition in roomToCreate)
         {

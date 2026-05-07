@@ -8,7 +8,6 @@ public class WalkGenerator : DungeonGenerator
     [SerializeField]
     protected DungeonSettings parameters;
 
-    [Button("Generate Dungeon", ButtonSizes.Gigantic), GUIColor(0.5f, 0.5f, 1f)]
     protected override void RunDungeonGenerator()
     {
         tilemapVisualizer.Clear();
@@ -30,7 +29,8 @@ public class WalkGenerator : DungeonGenerator
         {
             var path = DungeonAlgorithm.WalkGen(currentPos, parameters.walkLength);
             floorPositions.UnionWith(path);
-            currentPos = floorPositions.ElementAt(Random.Range(0, floorPositions.Count));
+            var orderedFloorPositions = floorPositions.OrderBy(position => position.x).ThenBy(position => position.y).ToList();
+            currentPos = orderedFloorPositions[Random.Range(0, orderedFloorPositions.Count)];
         }
         return floorPositions;
     }

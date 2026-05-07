@@ -287,6 +287,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DungeonGenFull
   tilemapVisualizer: {fileID: 1320503468}
   startPos: {x: 0, y: 0}
+  seed: 0
+  useRandomSeed: 0
+  lastUsedSeed: 0
   parameters: {fileID: 11400000, guid: 5d6e46b55e6bc954bb65e22e5c5bf70d, type: 2}
   roomPercent: 0.705
   spawnRoomCenter: {x: -2, y: -1}

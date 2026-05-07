@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class WallGenerator
@@ -20,7 +21,7 @@ public static class WallGenerator
         var wallPositions = FindWallsInDirections(floorPos, allWallDirections);
         var sortedWallPositions = SortWallPositions(floorPos, wallPositions);
 
-        foreach (var wallPosition in sortedWallPositions)
+        foreach (var wallPosition in sortedWallPositions.OrderBy(entry => entry.Key))
         {
             tilemapVisualizer.GenerateTiles(wallPosition.Key, TilemapVisualizer.BiomeType.None, wallPosition.Value);
         }
@@ -29,7 +30,7 @@ public static class WallGenerator
     private static HashSet<Vector2Int> FindWallsInDirections(HashSet<Vector2Int> floorPos, List<Vector2Int> dirList)
     {
         HashSet<Vector2Int> wallPositions = new HashSet<Vector2Int>();
-        foreach (var pos in floorPos)
+        foreach (var pos in floorPos.OrderBy(position => position.x).ThenBy(position => position.y))
         {
             foreach (var dir in dirList)
             {
@@ -49,7 +50,7 @@ public static class WallGenerator
     {
         var sortedWallPositions = new Dictionary<TilemapVisualizer.TileType, HashSet<Vector2Int>>();
 
-        foreach (var wallPosition in wallPositions)
+        foreach (var wallPosition in wallPositions.OrderBy(position => position.x).ThenBy(position => position.y))
         {
             // Pass wallPositions into the helper
             var wallType = GetWallType(floorPos, wallPositions, wallPosition);
