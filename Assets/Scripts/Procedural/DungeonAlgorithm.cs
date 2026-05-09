@@ -9,10 +9,10 @@ public static class DungeonAlgorithm
         Vertical
     }
 
+    // creates a wandering path by repeatedly stepping in a random cardinal direction
     public static HashSet<Vector2Int> WalkGen(Vector2Int startPos, int walkLength)
     {
-        HashSet<Vector2Int> path = new HashSet<Vector2Int>();
-        path.Add(startPos);
+        HashSet<Vector2Int> path = new HashSet<Vector2Int>{startPos};
         var previousPos = startPos;
 
         for (int i = 0; i < walkLength; i++)
@@ -24,6 +24,7 @@ public static class DungeonAlgorithm
         return path;
     }
 
+    // creates a straight corridor by choosing one direction and walking that way
     public static List<Vector2Int> CorridorGen(Vector2Int startPos, int corridorLength)
     {
         List<Vector2Int> corridor = new List<Vector2Int>();
@@ -43,6 +44,7 @@ public static class DungeonAlgorithm
 
 public static class Direction
 {
+    // the four directions available to random walks and corridor logic
     public static List<Vector2Int> dirList = new List<Vector2Int>
     {
         new Vector2Int(0,1),
@@ -51,6 +53,7 @@ public static class Direction
         new Vector2Int(-1,0)
     };
 
+    // returns one random direction from dirList
     public static Vector2Int GetRandomDirection()
     {
         return dirList[Random.Range(0, dirList.Count)];

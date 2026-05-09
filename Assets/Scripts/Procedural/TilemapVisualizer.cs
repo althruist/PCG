@@ -70,6 +70,7 @@ public class TilemapVisualizer : MonoBehaviour
         BuildDictionary();
     }
 
+    // creates dictionary of tiles from the inspector
     private void BuildDictionary()
     {
         tileDictionary = new Dictionary<(TileType, BiomeType), TileInfo>();
@@ -84,6 +85,7 @@ public class TilemapVisualizer : MonoBehaviour
         }
     }
 
+    // paints a tile of the requested type/biome at every position
     public void GenerateTiles(TileType tileType, BiomeType biome, IEnumerable<Vector2Int> positions)
     {
         if (!TryGetTileInfo(tileType, biome, out var info)) { return; }
@@ -94,6 +96,7 @@ public class TilemapVisualizer : MonoBehaviour
         }
     }
 
+    // finds the best tile entry
     private bool TryGetTileInfo(TileType tileType, BiomeType biome, out TileInfo info)
     {
         if (tileDictionary.TryGetValue((tileType, biome), out info) && IsUsable(info))
@@ -101,21 +104,10 @@ public class TilemapVisualizer : MonoBehaviour
             return true;
         }
 
-        if (biome != BiomeType.None
-            && tileDictionary.TryGetValue((tileType, BiomeType.None), out info)
-            && IsUsable(info))
-        {
-            return true;
-        }
-
-        if (IsWallTile(tileType))
-        {
-            return tileDictionary.TryGetValue((TileType.WallTop, BiomeType.None), out info) && IsUsable(info);
-        }
-
         return false;
     }
 
+    // checks that a tile entry has a target tilemap and at least one tile variant
     private bool IsUsable(TileInfo info)
     {
         return info.tilemap != null
@@ -123,30 +115,14 @@ public class TilemapVisualizer : MonoBehaviour
             && info.tileList.Count > 0;
     }
 
-    private bool IsWallTile(TileType tileType)
-    {
-        return tileType == TileType.WallTop
-            || tileType == TileType.WallBottom
-            || tileType == TileType.WallLeft
-            || tileType == TileType.WallRight
-            || tileType == TileType.WallTopLeft
-            || tileType == TileType.WallTopRight
-            || tileType == TileType.WallBottomLeft
-            || tileType == TileType.WallBottomRight
-            || tileType == TileType.WallInnerTopLeft
-            || tileType == TileType.WallInnerTopRight
-            || tileType == TileType.WallInnerBottomLeft
-            || tileType == TileType.WallInnerBottomRight
-            || tileType == TileType.WallSingleHole
-            || tileType == TileType.WallFull;
-    }
-
+    // converts a grid position into a tilemap cell and paints a random tile variant
     private void GenerateTile(Tilemap tilemap, List<TileBase> tileList, Vector2Int pos)
     {
         var tilePos = tilemap.WorldToCell((Vector3Int)pos);
         tilemap.SetTile(tilePos, tileList[Random.Range(0, tileList.Count)]);
     }
 
+    // clears each tilemap referenced by the configured tile entries once
     public void Clear()
     {
         HashSet<Tilemap> cleared = new HashSet<Tilemap>();
