@@ -207,7 +207,7 @@ MonoBehaviour:
     m_Value: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 0.143
+    m_Value: 0.74
   response:
     m_OverrideState: 1
     m_Value: 1
@@ -306,10 +306,10 @@ MonoBehaviour:
     m_Value: 1
   threshold:
     m_OverrideState: 1
-    m_Value: 0.79
+    m_Value: 0.56
   intensity:
     m_OverrideState: 1
-    m_Value: 2.83
+    m_Value: 2.76
   scatter:
     m_OverrideState: 1
     m_Value: 0.255
@@ -353,13 +353,13 @@ MonoBehaviour:
   active: 1
   shadows:
     m_OverrideState: 1
-    m_Value: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    m_Value: {r: 0.6415094, g: 0.46297613, b: 0.46297613, a: 1}
   highlights:
     m_OverrideState: 1
-    m_Value: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    m_Value: {r: 0.6084906, g: 0.797639, b: 1, a: 1}
   balance:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 13.3
 --- !u!114 &-3386560400091697801
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -473,7 +473,7 @@ MonoBehaviour:
     m_Value: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 0.24
   clamp:
     m_OverrideState: 1
     m_Value: 0.05
@@ -606,7 +606,7 @@ MonoBehaviour:
   active: 1
   intensity:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 0.352
   xMultiplier:
     m_OverrideState: 1
     m_Value: 1
@@ -736,7 +736,7 @@ MonoBehaviour:
   active: 1
   postExposure:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 0.85
   contrast:
     m_OverrideState: 1
     m_Value: 0
@@ -792,7 +792,7 @@ MonoBehaviour:
   active: 1
   distance:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 0.559
   cropToFit:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.355
