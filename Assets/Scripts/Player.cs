@@ -1,16 +1,25 @@
+using System.Collections;
+using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
-public class Player : MonoBehaviour
+public class Player : Entity
 {
     private DungeonGenerator dungeonGenerator;
-
-
-    [SerializeField] private float moveSpeed = 3f;
+    public int kills = 0;
+    private bool isAttacking = false;
+    public GameObject sword;
+    [SerializeField] private Tilemap liquidTilemap;
 
     private Rigidbody2D rb;
     private Vector2 movement;
-    private Animator animator;
-    private SpriteRenderer sprite;
+
+    public override void TakeDamage(int Damage)
+    {
+        base.TakeDamage(Damage);
+        Debug.Log("take damage");
+    }
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -25,6 +34,13 @@ public class Player : MonoBehaviour
     {
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
+
+        CheckCurrentTile();
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            StartCoroutine(SwordSwing());
+        }
 
         movement = movement.normalized;
         if (movement == new Vector2(0, 0))
@@ -64,6 +80,59 @@ public class Player : MonoBehaviour
                 animator.SetBool("IsWalkingUp", false);
                 animator.SetBool("IsWalking", false);
             }
+        }
+    }
+
+    IEnumerator SwordSwing()
+    {
+        if (isAttacking) yield break;
+        isAttacking = true;
+        GameObject swordInstance = Instantiate(sword, transform.position, Quaternion.identity);
+
+        float duration = 0.3f;
+        float elapsed = 0f;
+
+        float radius = 1.2f;
+        animator.SetTrigger("Attack");
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+
+            float angle = (elapsed / duration) * 360f;
+            float rad = angle * Mathf.Deg2Rad;
+
+            Vector3 offset = new Vector3(Mathf.Cos(rad), Mathf.Sin(rad), 0) * radius;
+
+            swordInstance.transform.position = transform.position + offset;
+
+            yield return null;
+        }
+
+        Destroy(swordInstance);
+        isAttacking = false;
+    }
+
+    private void CheckCurrentTile()
+    {
+        Vector3Int tilePos = liquidTilemap.WorldToCell(transform.position);
+        TileBase currentTile = liquidTilemap.GetTile(tilePos);
+
+        if (currentTile != null)
+        {
+            Debug.Log("Standing on: " + currentTile.name);
+            if (currentTile.name.Contains("Water"))
+            {
+                moveSpeed = 1;
+            }
+            else if (currentTile.name.Contains("Lava"))
+            {
+                TakeDamage(5);
+            }
+        }
+        else
+        {
+            moveSpeed = 3;
         }
     }
 
