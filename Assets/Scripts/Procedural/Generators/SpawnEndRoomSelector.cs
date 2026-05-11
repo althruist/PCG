@@ -4,6 +4,8 @@ using UnityEngine;
 
 public static class SpawnEndRoomSelector
 {
+    private static Vector2 spawnCenter;
+
     // picks the room nearest to start as spawn and the farthest reachable room as the end
     public static void SelectSpawnAndEndRooms(
         List<DungeonRoom> rooms,
@@ -37,6 +39,12 @@ public static class SpawnEndRoomSelector
 
         spawnRoomCenter = spawnRoom.Center;
         endRoomCenter = endRoom?.Center ?? spawnRoom.Center;
+        spawnCenter = spawnRoom.Center;
+    }
+
+    public static Vector2 getSpawnCenter()
+    {
+        return spawnCenter;
     }
 
     // flood-fills through floor positions to measure path distance from the spawn room

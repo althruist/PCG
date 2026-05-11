@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 3364095454133129808}
   - component: {fileID: 7472234554148388371}
   - component: {fileID: 1531888395340399243}
-  - component: {fileID: 3244138561572457799}
   - component: {fileID: 3582368768862110641}
   m_Layer: 0
   m_Name: Sword
@@ -140,18 +139,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.21875, y: 0.5}
   m_EdgeRadius: 0
---- !u!114 &3244138561572457799
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6037722618794413556}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ef369008e064784693b8fa0bc5e11f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Sword
 --- !u!50 &3582368768862110641
 Rigidbody2D:
   serializedVersion: 5

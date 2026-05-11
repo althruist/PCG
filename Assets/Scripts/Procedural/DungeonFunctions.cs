@@ -20,36 +20,45 @@ public abstract class DungeonFunctions : MonoBehaviour
     public bool useRandomSeed = false;
     [SerializeField, ReadOnly]
     public int lastUsedSeed = 0;
-    [BoxGroup("Floor Biomes")]
-    [SerializeField]
+    [BoxGroup("Floor Biomes"), SerializeField]
     private bool useFloorBiomes = true;
-    [BoxGroup("Floor Biomes")]
-    [SerializeField, MinValue(1)]
+    [BoxGroup("Floor Biomes"), SerializeField, MinValue(1)]
     private int biomeRegionCount = 8;
-    [BoxGroup("Floor Biomes")]
-    [SerializeField, MinValue(0f)]
+    [BoxGroup("Floor Biomes"), SerializeField, MinValue(0f)]
     private float biomeDitherWidth = 3f;
-    [BoxGroup("Liquids")]
-    [SerializeField]
+    [BoxGroup("Liquids"), SerializeField]
     private bool generateLiquids = true;
-    [BoxGroup("Liquids")]
-    [SerializeField, MinValue(0)]
+    [BoxGroup("Liquids"), SerializeField, MinValue(0)]
     private int ivyWaterPondCount = 2;
-    [BoxGroup("Liquids")]
-    [SerializeField, MinValue(0)]
+    [BoxGroup("Liquids"), SerializeField, MinValue(0)]
     private int obsidianLavaPondCount = 2;
-    [BoxGroup("Liquids")]
-    [SerializeField, MinValue(1)]
+    [BoxGroup("Liquids"), SerializeField, MinValue(1)]
     private int minPondSize = 5;
-    [BoxGroup("Liquids")]
-    [SerializeField, MinValue(1)]
+    [BoxGroup("Liquids"), SerializeField, MinValue(1)]
     private int maxPondSize = 14;
-    [BoxGroup("Decorations")]
-    [SerializeField]
+    [BoxGroup("Decorations"), SerializeField]
     private bool generateDecorations = true;
-    [BoxGroup("Decorations")]
-    [SerializeField, Range(0f, 1f)]
+    [BoxGroup("Decorations"), SerializeField, Range(0f, 1f)]
     private float decorationChance = 0.06f;
+    [BoxGroup("Traps"), SerializeField]
+    private bool generateTraps = true;
+    [BoxGroup("Traps"), SerializeField, Range(0f, 1f)]
+    private float trapsChance = 0.06f;
+    [BoxGroup("Enemies"), SerializeField, Range(0f, 1f)]
+    private float enemy1SpawnRateChance = 0.05f;
+    [BoxGroup("Enemies"), SerializeField, Range(0f, 1f)]
+    private float enemy2SpawnRateChance = 0.05f;
+    [BoxGroup("Enemies"), SerializeField]
+    private GameObject enemy1;
+    [BoxGroup("Enemies"), SerializeField]
+    private GameObject enemy2;
+    [BoxGroup("Enemies"), SerializeField]
+    private float spawnRadiusSafeDistance;
+    [BoxGroup("Collectables"), SerializeField]
+    public int collectablesAmount = 3;
+    [BoxGroup("Collectables"), SerializeField]
+    public GameObject collectable;
+
 
     [Button("Generate Dungeon", ButtonSizes.Gigantic), GUIColor(0.5f, 0.5f, 1f)]
     // seeds random state, clears the current map, then runs the generator
@@ -76,6 +85,8 @@ public abstract class DungeonFunctions : MonoBehaviour
     public void ResetDungeon()
     {
         tilemapVisualizer.Clear();
+        EnemySpawner.Clear();
+        CollectablesSpawner.Clear();
     }
 
     protected abstract void RunDungeonGenerator();
@@ -130,5 +141,29 @@ public abstract class DungeonFunctions : MonoBehaviour
             decorationChance,
             blockedPositions,
             protectedPositions);
+    }
+
+    protected void GenerateTraps(
+    HashSet<Vector2Int> floorPositions,
+    HashSet<Vector2Int> blockedPositions = null,
+    IEnumerable<Vector2Int> protectedPositions = null)
+    {
+        TrapGenerator.GenerateTraps(
+            tilemapVisualizer,
+            floorPositions,
+            generateTraps,
+            trapsChance,
+            blockedPositions,
+            protectedPositions);
+    }
+
+    protected void SpawnRandomCollectables(HashSet<Vector2Int> floorPositions, int collectablesAmount, GameObject collectable, HashSet<Vector2Int> blockedPositions, IEnumerable<Vector2Int> protectedPositions = null)
+    {
+        CollectablesSpawner.Spawn(floorPositions, collectablesAmount, collectable, blockedPositions, protectedPositions);
+    }
+
+    protected void SpawnRandomEnemies(HashSet<Vector2Int> floorPositions)
+    {
+        EnemySpawner.Spawn(floorPositions, enemy1SpawnRateChance, enemy2SpawnRateChance, enemy1, enemy2, SpawnEndRoomSelector.getSpawnCenter(), spawnRadiusSafeDistance);
     }
 }

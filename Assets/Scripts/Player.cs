@@ -1,5 +1,4 @@
 using System.Collections;
-using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -7,9 +6,15 @@ public class Player : Entity
 {
     private DungeonGenerator dungeonGenerator;
     public int kills = 0;
+    public int collectables = 0;
     private bool isAttacking = false;
     public GameObject sword;
     [SerializeField] private Tilemap liquidTilemap;
+    [SerializeField] private Tilemap trapsTilemap;
+    private bool onPressurePlate = false;
+
+    [SerializeField] private GameObject arrowPrefab;
+    [SerializeField] private float arrowSpeed = 8f;
 
     private Rigidbody2D rb;
     private Vector2 movement;
@@ -32,6 +37,7 @@ public class Player : Entity
 
     private void Update()
     {
+        if (isDead) return;
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
@@ -113,14 +119,61 @@ public class Player : Entity
         isAttacking = false;
     }
 
+    void SpawnArrow()
+    {
+        Vector3 spawnPos = transform.position + Vector3.up * 5f;
+
+        GameObject arrow = Instantiate(arrowPrefab, spawnPos, Quaternion.identity);
+
+        Vector3 direction = (transform.position - spawnPos).normalized;
+
+        arrow.GetComponent<Rigidbody2D>().linearVelocity = direction * arrowSpeed;
+    }
+
+    IEnumerator TriggerArrows()
+    {
+        int arrowCount = 5;
+
+        for (int i = 0; i < arrowCount; i++)
+        {
+            SpawnArrow();
+            yield return new WaitForSeconds(0.3f);
+        }
+    }
+
     private void CheckCurrentTile()
     {
         Vector3Int tilePos = liquidTilemap.WorldToCell(transform.position);
+        Vector3Int tTilePos = trapsTilemap.WorldToCell(transform.position);
         TileBase currentTile = liquidTilemap.GetTile(tilePos);
+        TileBase tCurrentTile = trapsTilemap.GetTile(tTilePos);
+
+        if (tCurrentTile != null)
+        {
+            if (tCurrentTile.name == "PoisonFlower")
+            {
+                TakeDamage(4);
+            }
+            else if (tCurrentTile.name == "Spikes")
+            {
+                TakeDamage(15);
+            }
+            else if (tCurrentTile.name == "PressurePlate")
+            {
+                if (!onPressurePlate)
+                {
+                    onPressurePlate = true;
+                    StartCoroutine(TriggerArrows());
+                }
+            }
+        }
+        else
+        {
+            onPressurePlate = false;
+        }
 
         if (currentTile != null)
         {
-            Debug.Log("Standing on: " + currentTile.name);
             if (currentTile.name.Contains("Water"))
             {
                 moveSpeed = 1;

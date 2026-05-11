@@ -29,7 +29,8 @@ public class TilemapVisualizer : MonoBehaviour
         End,
         Water,
         Lava,
-        Decoration
+        Decoration,
+        Trap
     }
 
     public enum BiomeType

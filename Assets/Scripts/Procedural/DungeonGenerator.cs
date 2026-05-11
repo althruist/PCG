@@ -1,11 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class DungeonGenerator : DungeonFunctions
 {
-    [SerializeField]
-    [Range(0.1f, 1f)]
+    [SerializeField, Range(0.1f, 1f)]
     private float roomPercent = 0.8f;
 
     [SerializeField, ReadOnly]
@@ -20,7 +20,6 @@ public class DungeonGenerator : DungeonFunctions
     // start of the whole dungeon generation
     protected override void RunDungeonGenerator()
     {
-        tilemapVisualizer.Clear();
         DungeonBuilder();
     }
 
@@ -30,6 +29,8 @@ public class DungeonGenerator : DungeonFunctions
         HashSet<Vector2Int> floorPositions = new HashSet<Vector2Int>();
         HashSet<Vector2Int> potentialRoomPositions = new HashSet<Vector2Int>();
         tilemapVisualizer.Clear();
+        EnemySpawner.Clear();
+        CollectablesSpawner.Clear();
         CorridorGenerator.CreateCorridors(startPos, corridorCount, corridorLength, floorPositions, potentialRoomPositions);
         HashSet<Vector2Int> corridorPositions = new HashSet<Vector2Int>(floorPositions);
 
@@ -55,9 +56,20 @@ public class DungeonGenerator : DungeonFunctions
             corridorPositions,
             new[] { spawnRoomCenter, endRoomCenter });
         GenerateDecorations(floorPositions, liquidPositions, new[] { spawnRoomCenter, endRoomCenter });
+
+        HashSet<Vector2Int> blockedPositions = new HashSet<Vector2Int>(corridorPositions);
+        blockedPositions.UnionWith(liquidPositions);
+        blockedPositions.UnionWith(DecorationGenerator.getDecorationPositions());
+
+        GenerateTraps(floorPositions, blockedPositions, new[] { spawnRoomCenter, endRoomCenter });
         WallGenerator.CreateWalls(floorPositions, tilemapVisualizer);
 
         tilemapVisualizer.GenerateTiles(TilemapVisualizer.TileType.Spawn, TilemapVisualizer.BiomeType.None, new[] { spawnRoomCenter });
         tilemapVisualizer.GenerateTiles(TilemapVisualizer.TileType.End, TilemapVisualizer.BiomeType.None, new[] { endRoomCenter });
+
+        blockedPositions.UnionWith(TrapGenerator.getTrapPositions());
+
+        SpawnRandomCollectables(floorPositions, collectablesAmount, collectable, blockedPositions, new[] { spawnRoomCenter, endRoomCenter });
+        SpawnRandomEnemies(floorPositions);
     }
 }

@@ -80,25 +80,14 @@ public class Enemy : Entity
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (
             enemy == enemyType.Patrol &&
             collision.gameObject.name != "Sword(Clone)" &&
             collision.gameObject.name != "Player"
-        )
-        {
-            direction *= -1;
-        }
+        ) { direction *= -1; }
 
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            collision.gameObject.GetComponent<Player>().TakeDamage(damage);
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
         if (collision.gameObject.CompareTag("Player"))
         {
             collision.gameObject.GetComponent<Player>().TakeDamage(damage);

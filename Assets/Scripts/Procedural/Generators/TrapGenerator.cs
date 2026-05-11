@@ -3,20 +3,20 @@ using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public static class DecorationGenerator
+public static class TrapGenerator
 {
-    private static List<Vector2Int> decoPos;
-    // randomly selects floor positions for decorations while skipping blocked/protected cells
-    public static void GenerateDecorations(
+    private static List<Vector2Int> trapPos;
+    // randomly selects trap positions for decorations while skipping blocked/protected cells
+    public static void GenerateTraps(
         TilemapVisualizer tilemapVisualizer,
         HashSet<Vector2Int> floorPositions,
-        bool generateDecorations,
-        float decorationChance,
+        bool generateTraps,
+        float trapsChance,
         HashSet<Vector2Int> blockedPositions = null,
         IEnumerable<Vector2Int> protectedPositions = null)
     {
-        if (generateDecorations == false
-            || decorationChance <= 0f
+        if (generateTraps == false
+            || trapsChance <= 0f
             || floorPositions == null
             || floorPositions.Count == 0)
         {
@@ -27,7 +27,7 @@ public static class DecorationGenerator
         HashSet<Vector2Int> protectedPositionSet = protectedPositions != null
             ? new HashSet<Vector2Int>(protectedPositions)
             : new HashSet<Vector2Int>();
-        List<Vector2Int> decorationPositions = new List<Vector2Int>();
+        List<Vector2Int> trapPositions = new List<Vector2Int>();
 
         foreach (var position in floorPositions.OrderBy(position => position.x).ThenBy(position => position.y))
         {
@@ -36,22 +36,22 @@ public static class DecorationGenerator
                 continue;
             }
 
-            if (Random.value <= decorationChance)
+            if (Random.value <= trapsChance)
             {
-                decorationPositions.Add(position);
+                trapPositions.Add(position);
             }
         }
 
-        decoPos = decorationPositions;
+        trapPos = trapPositions;
 
         tilemapVisualizer.GenerateTiles(
-            TilemapVisualizer.TileType.Decoration,
+            TilemapVisualizer.TileType.Trap,
             TilemapVisualizer.BiomeType.None,
-            decorationPositions);
+            trapPositions);
     }
 
-    public static List<Vector2Int> getDecorationPositions()
+    public static List<Vector2Int> getTrapPositions()
     {
-        return decoPos;
+        return trapPos;
     }
 }
