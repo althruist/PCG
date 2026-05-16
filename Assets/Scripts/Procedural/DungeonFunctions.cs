@@ -6,6 +6,8 @@ using Random = UnityEngine.Random;
 
 public abstract class DungeonFunctions : MonoBehaviour
 {
+    private const int DefaultPlayerHealth = 100;
+
     [BoxGroup("Parameters")]
     [MinValue(0)]
     public int repetitions = 10, walkLength = 10, corridorLength = 10, corridorCount = 10;
@@ -59,6 +61,25 @@ public abstract class DungeonFunctions : MonoBehaviour
     [BoxGroup("Collectables"), SerializeField]
     public GameObject collectable;
 
+    private bool adaptiveDefaultsCaptured = false;
+    private int baseRepetitions;
+    private int baseWalkLength;
+    private int baseCorridorLength;
+    private int baseCorridorCount;
+    private int baseIvyWaterPondCount;
+    private int baseObsidianLavaPondCount;
+    private int baseMinPondSize;
+    private int baseMaxPondSize;
+    private float baseTrapsChance;
+    private float baseEnemy1SpawnRateChance;
+    private float baseEnemy2SpawnRateChance;
+    private int baseCollectablesAmount;
+
+    protected virtual void Awake()
+    {
+        CacheAdaptiveDefaults();
+    }
+
 
     [Button("Generate Dungeon", ButtonSizes.Gigantic), GUIColor(0.5f, 0.5f, 1f)]
     // seeds random state, clears the current map, then runs the generator
@@ -89,7 +110,100 @@ public abstract class DungeonFunctions : MonoBehaviour
         CollectablesSpawner.Clear();
     }
 
+    public void AdaptGenerationToPlayerStats(int playerHealth, int kills, int collectables, float clearTimeSeconds)
+    {
+        CacheAdaptiveDefaults();
+
+        int difficultyShift = 0;
+
+        if (playerHealth >= DefaultPlayerHealth * 0.75f)
+        {
+            difficultyShift++;
+        }
+        else if (playerHealth <= DefaultPlayerHealth * 0.35f)
+        {
+            difficultyShift--;
+        }
+
+        if (kills >= 8)
+        {
+            difficultyShift++;
+        }
+        else if (kills <= 2)
+        {
+            difficultyShift--;
+        }
+
+        if (collectables >= 3)
+        {
+            difficultyShift++;
+        }
+        else if (collectables == 0)
+        {
+            difficultyShift--;
+        }
+
+        if (clearTimeSeconds <= 45f)
+        {
+            difficultyShift++;
+        }
+        else if (clearTimeSeconds >= 120f)
+        {
+            difficultyShift--;
+        }
+
+        repetitions = SmoothAdjustInt(repetitions, baseRepetitions + difficultyShift, 1, 6, 18);
+        walkLength = SmoothAdjustInt(walkLength, baseWalkLength + (difficultyShift * 2), 2, 6, 22);
+        corridorLength = SmoothAdjustInt(corridorLength, baseCorridorLength + (difficultyShift * 2), 2, 6, 24);
+        corridorCount = SmoothAdjustInt(corridorCount, baseCorridorCount + difficultyShift, 1, 5, 18);
+
+        ivyWaterPondCount = SmoothAdjustInt(ivyWaterPondCount, baseIvyWaterPondCount + difficultyShift, 1, 0, 6);
+        obsidianLavaPondCount = SmoothAdjustInt(obsidianLavaPondCount, baseObsidianLavaPondCount + difficultyShift, 1, 0, 6);
+        minPondSize = SmoothAdjustInt(minPondSize, baseMinPondSize + difficultyShift, 1, 2, 16);
+        maxPondSize = SmoothAdjustInt(maxPondSize, baseMaxPondSize + difficultyShift, 1, minPondSize + 1, 24);
+
+        trapsChance = SmoothAdjustFloat(trapsChance, baseTrapsChance + (difficultyShift * 0.02f), 0.01f, 0.01f, 0.2f);
+        enemy1SpawnRateChance = SmoothAdjustFloat(enemy1SpawnRateChance, baseEnemy1SpawnRateChance + (difficultyShift * 0.02f), 0.01f, 0.01f, 0.22f);
+        enemy2SpawnRateChance = SmoothAdjustFloat(enemy2SpawnRateChance, baseEnemy2SpawnRateChance + (difficultyShift * 0.02f), 0.01f, 0.01f, 0.2f);
+        collectablesAmount = SmoothAdjustInt(collectablesAmount, baseCollectablesAmount - difficultyShift, 1, 1, 8);
+    }
+
     protected abstract void RunDungeonGenerator();
+
+    private void CacheAdaptiveDefaults()
+    {
+        if (adaptiveDefaultsCaptured)
+        {
+            return;
+        }
+
+        adaptiveDefaultsCaptured = true;
+        baseRepetitions = repetitions;
+        baseWalkLength = walkLength;
+        baseCorridorLength = corridorLength;
+        baseCorridorCount = corridorCount;
+        baseIvyWaterPondCount = ivyWaterPondCount;
+        baseObsidianLavaPondCount = obsidianLavaPondCount;
+        baseMinPondSize = minPondSize;
+        baseMaxPondSize = maxPondSize;
+        baseTrapsChance = trapsChance;
+        baseEnemy1SpawnRateChance = enemy1SpawnRateChance;
+        baseEnemy2SpawnRateChance = enemy2SpawnRateChance;
+        baseCollectablesAmount = collectablesAmount;
+    }
+
+    private int SmoothAdjustInt(int currentValue, int targetValue, int maxStep, int minValue, int maxValue)
+    {
+        int clampedTarget = Mathf.Clamp(targetValue, minValue, maxValue);
+        float nextValue = Mathf.MoveTowards(currentValue, clampedTarget, maxStep);
+        return Mathf.Clamp(Mathf.RoundToInt(nextValue), minValue, maxValue);
+    }
+
+    private float SmoothAdjustFloat(float currentValue, float targetValue, float maxStep, float minValue, float maxValue)
+    {
+        float clampedTarget = Mathf.Clamp(targetValue, minValue, maxValue);
+        return Mathf.Clamp(Mathf.MoveTowards(currentValue, clampedTarget, maxStep), minValue, maxValue);
+    }
 
     // runs the random walk generator
     protected HashSet<Vector2Int> RunRandomWalk(Vector2Int pos)

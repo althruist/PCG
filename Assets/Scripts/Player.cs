@@ -4,6 +4,8 @@ using UnityEngine.Tilemaps;
 
 public class Player : Entity
 {
+    private const int MaxPlayerHealth = 100;
+
     private DungeonGenerator dungeonGenerator;
     public int kills = 0;
     public int collectables = 0;
@@ -11,6 +13,7 @@ public class Player : Entity
     public GameObject sword;
     [SerializeField] private Tilemap liquidTilemap;
     [SerializeField] private Tilemap trapsTilemap;
+    [SerializeField] private Tilemap spawnTilemap;
     private bool onPressurePlate = false;
 
     [SerializeField] private GameObject arrowPrefab;
@@ -18,6 +21,8 @@ public class Player : Entity
 
     private Rigidbody2D rb;
     private Vector2 movement;
+    private bool isChangingFloor = false;
+    private float floorStartTime;
 
     public override void TakeDamage(int Damage)
     {
@@ -33,6 +38,7 @@ public class Player : Entity
 
         Vector2Int spawnPos = dungeonGenerator.SpawnRoomCenter;
         transform.position = new Vector3(spawnPos.x + 0.5f, spawnPos.y + 0.5f, 0);
+        floorStartTime = Time.time;
     }
 
     private void Update()
@@ -145,9 +151,18 @@ public class Player : Entity
     {
         Vector3Int tilePos = liquidTilemap.WorldToCell(transform.position);
         Vector3Int tTilePos = trapsTilemap.WorldToCell(transform.position);
+        Vector3Int sTilePos = spawnTilemap.WorldToCell(transform.position);
         TileBase currentTile = liquidTilemap.GetTile(tilePos);
         TileBase tCurrentTile = trapsTilemap.GetTile(tTilePos);
+        TileBase sCurrentTile = spawnTilemap.GetTile(sTilePos);
 
+        if (sCurrentTile != null)
+        {
+            if (sCurrentTile.name == "End" && !isChangingFloor)
+            {
+                StartCoroutine(AdvanceToNextFloor());
+            }
+        }
         if (tCurrentTile != null)
         {
             if (tCurrentTile.name == "PoisonFlower")
@@ -192,5 +207,27 @@ public class Player : Entity
     private void FixedUpdate()
     {
         rb.linearVelocity = movement * moveSpeed;
+    }
+
+    private IEnumerator AdvanceToNextFloor()
+    {
+        isChangingFloor = true;
+        movement = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
+        float clearTimeSeconds = Time.time - floorStartTime;
+
+        dungeonGenerator.AdaptGenerationToPlayerStats(
+            Mathf.Clamp(health, 0, MaxPlayerHealth),
+            kills,
+            collectables,
+            clearTimeSeconds);
+        dungeonGenerator.GenerateDungeon();
+
+        Vector2Int spawnPos = dungeonGenerator.SpawnRoomCenter;
+        transform.position = new Vector3(spawnPos.x + 0.5f, spawnPos.y + 0.5f, 0f);
+        floorStartTime = Time.time;
+
+        yield return null;
+        isChangingFloor = false;
     }
 }
