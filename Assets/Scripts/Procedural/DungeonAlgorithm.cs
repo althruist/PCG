@@ -3,12 +3,6 @@ using UnityEngine;
 
 public static class DungeonAlgorithm
 {
-    private enum splitType
-    {
-        Horizontal,
-        Vertical
-    }
-
     // creates a wandering path by repeatedly stepping in a random cardinal direction
     public static HashSet<Vector2Int> WalkGen(Vector2Int startPos, int walkLength)
     {

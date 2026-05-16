@@ -41,10 +41,6 @@ public static class CollectablesSpawner
         List<Vector2Int> spawnedPositions =
             new List<Vector2Int>();
 
-        // ------------------------
-        // FIRST SPAWN = RANDOM
-        // ------------------------
-
         Vector2Int firstPos =
             validPositions[Random.Range(0, validPositions.Count)];
 
@@ -53,10 +49,6 @@ public static class CollectablesSpawner
         spawnedPositions.Add(firstPos);
 
         validPositions.Remove(firstPos);
-
-        // ------------------------
-        // REMAINING SPAWNS
-        // ------------------------
 
         while (spawnedPositions.Count < collectablesAmount)
         {
